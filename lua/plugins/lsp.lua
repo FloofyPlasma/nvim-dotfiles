@@ -52,6 +52,14 @@ return {
 					keys = {
 						{ "<leader>ch", "<cmd>LspClangdSwitchSourceHeader<cr>", desc = "Switch Source/Header (C/C++)" },
 					},
+					cmd = {
+						"clangd",
+						"--background-index",
+						"--clang-tidy",
+						"--completion-style=bundled",
+						"--cross-file-rename",
+						"--header-insertion=iwyu",
+					},
 				},
 				ts_ls = {},
 				lua_ls = {
