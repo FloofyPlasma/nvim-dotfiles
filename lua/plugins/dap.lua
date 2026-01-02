@@ -66,7 +66,6 @@ return {
 				automatic_installation = true,
 				handlers = {},
 				ensure_installed = {
-					"delve",
 					"codelldb",
 				},
 			})
