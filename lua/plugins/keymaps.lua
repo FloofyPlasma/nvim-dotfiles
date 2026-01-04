@@ -17,6 +17,9 @@ return {
 
 			-- Diagnostic quickfix list
 			{ "<leader>q", vim.diagnostic.setloclist, desc = "Open diagnostic [Q]uickfix list" },
+
+			-- CMake
+			{ "<leader><F5>", "<cmd>CMakeBuild<CR>", desc = "Build with CMake" },
 		},
 	},
 }
