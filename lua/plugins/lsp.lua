@@ -59,6 +59,7 @@ return {
 						"--completion-style=bundled",
 						"--cross-file-rename",
 						"--header-insertion=iwyu",
+						"--experimental-modules-support",
 					},
 				},
 				ts_ls = {},
