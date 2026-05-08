@@ -23,6 +23,7 @@ vim.o.inccommand = "split"
 vim.o.cursorline = true
 vim.o.scrolloff = 10
 vim.o.confirm = true
+vim.o.modelines = 0
 
 -- Sync clipboard after UI starts
 vim.schedule(function()
@@ -75,3 +76,28 @@ require("lazy").setup({
 
 -- Set colorscheme
 vim.cmd.colorscheme("catppuccin-mocha")
+
+-- Objective-C
+vim.filetype.add({
+	extension = {
+		m = "objc",
+		mm = "objcpp",
+	},
+
+	pattern = {
+		[".*%.h"] = function(_, buffer)
+			local lines = vim.api.nvim_buf_get_lines(buffer, 0, 100, false)
+			local content = table.concat(lines, "\n")
+
+			if
+				content:match("@interface")
+				or content:match("@implementation")
+				or content:match("@protocol")
+				or content:match("@class")
+				or content:match("#import")
+			then
+				return "objc"
+			end
+		end,
+	},
+})
