@@ -71,22 +71,24 @@ return {
 			})
 
 			-- Dap UI setup
-			dapui.setup({
-				icons = { expanded = "▾", collapsed = "▸", current_frame = "*" },
-				controls = {
-					icons = {
-						pause = "⏸",
-						play = "▶",
-						step_into = "⏎",
-						step_over = "⏭",
-						step_out = "⏮",
-						step_back = "b",
-						run_last = "▶▶",
-						terminate = "⏹",
-						disconnect = "⏏",
+			vim.schedule(function()
+				dapui.setup({
+					icons = { expanded = "▾", collapsed = "▸", current_frame = "*" },
+					controls = {
+						icons = {
+							pause = "⏸",
+							play = "▶",
+							step_into = "⏎",
+							step_over = "⏭",
+							step_out = "⏮",
+							step_back = "b",
+							run_last = "▶▶",
+							terminate = "⏹",
+							disconnect = "⏏",
+						},
 					},
-				},
-			})
+				})
+			end)
 
 			-- Change breakpoint icons
 			-- Change breakpoint icons
@@ -130,8 +132,84 @@ return {
 					cwd = "${workspaceFolder}",
 				},
 			}
-
 			dap.configurations.cpp = dap.configurations.c
+
+			-- // OBJC // --
+
+			local is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
+			local uname = (not is_windows) and vim.fn.system("uname"):gsub("\n", "") or ""
+			local is_mac = uname == "Darwin"
+			local is_linux = uname == "Linux"
+
+			local gnustep_makefiles = (function()
+				if is_mac then
+					return nil
+				end
+				local candidates = {
+					"/usr/share/GNUstep/Makefiles",
+					"/usr/local/share/GNUstep/Makefiles",
+					"/opt/GNUstep/System/Library/Makefiles",
+				}
+				for _, path in ipairs(candidates) do
+					if vim.fn.isdirectory(path) == 1 then
+						return path
+					end
+				end
+
+				local cfg = vim.fn.system("gnustep-config --variable=GNUSTEP_MAKEFILES 2>/dev/null"):gsub("\n", "")
+				return cfg ~= "" and cfg or nil
+			end)()
+
+			local function build_objc()
+				if is_windows then
+					vim.notifiy("GNUstep on Windows is not supported", vim.log.levels.ERROR)
+					return
+				elseif is_mac then
+					vim.fn.system("make 2>&1")
+				elseif is_linux and gnustep_makefiles then
+					vim.fn.system(string.format("bash -c 'source %s/GNUstep.sh && make 2>&1'", gnustep_makefiles))
+				else
+					vim.notify("Could not find GNUstep makefiles", vim.log.levels.ERROR)
+				end
+			end
+
+			local function find_app_binary()
+				local app = vim.fn.glob(vim.fn.getcwd() .. "/*.app")
+				if app == "" then
+					vim.notify("No .app bundle found. Did make succeed?", vim.log.level.ERROR)
+					return nil
+				end
+				app = app:gsub("\n", "")
+				local name = vim.fn.fnamemodify(app, ":t:r")
+				if is_mac then
+					return app .. "/Contents/MacOS/" .. name
+				else
+					return app .. "/" .. name
+				end
+			end
+
+			local objc_env = {}
+			if is_linux and gnustep_makefiles then
+				objc_env = {
+					GNUSTEP_MAKEFILES = gnustep_makefiles,
+				}
+			end
+
+			dap.configurations.objc = {
+				{
+					name = "GNUstep: Build and Debug",
+					type = "codelldb",
+					request = "launch",
+					program = function()
+						build_objc()
+						return find_app_binary()
+					end,
+					cwd = "${workspaceFolder}",
+					env = objc_env,
+					stopOnEntry = false,
+				},
+			}
+			dap.configurations.objcpp = dap.configurations.objc
 		end,
 	},
 }
