@@ -61,6 +61,7 @@ return {
 						"--header-insertion=iwyu",
 						"--experimental-modules-support",
 					},
+					filetypes = { "c", "cpp", "objc", "objcpp" },
 				},
 				ts_ls = {},
 				lua_ls = {
@@ -72,22 +73,31 @@ return {
 						},
 					},
 				},
-			},
-			setup = {
-				-- Configure SourceKit for Swift
-				sourcekit = function(_, opts)
-					require("lspconfig").sourcekit.setup({
-						capabilities = {
-							workspace = {
-								didChangeWatchedFiles = {
-									dynamicRegistration = true,
-								},
+				sourcekit = {
+					cmd = { "sourcekit-lsp" },
+					filetypes = { "swift" },
+					root_markers = {
+						".git",
+						"Package.swift",
+						"compile_commands.json",
+						".sourcekit-lsp",
+					},
+					capabilities = {
+						workspace = {
+							didChangeWatchedFiles = {
+								dynamicRegistration = true,
 							},
 						},
-					})
-					return true
-				end,
+						textDocument = {
+							diagnostic = {
+								dynamicRegistration = true,
+								relatedDocumentSupport = true,
+							},
+						},
+					},
+				},
 			},
+			setup = {},
 		},
 	},
 
