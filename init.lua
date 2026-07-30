@@ -101,3 +101,11 @@ vim.filetype.add({
 		end,
 	},
 })
+
+-- Assembly
+vim.filetype.add({
+	extension = {
+		inc = "fasm", -- Probably will conflict in some places...
+		asm = "fasm",
+	},
+})
