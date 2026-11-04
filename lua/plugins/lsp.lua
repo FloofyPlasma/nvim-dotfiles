@@ -52,6 +52,23 @@ return {
 					keys = {
 						{ "<leader>ch", "<cmd>LspClangdSwitchSourceHeader<cr>", desc = "Switch Source/Header (C/C++)" },
 					},
+					root_markers = {
+						"compile_commands.json",
+						"compile_flags.txt",
+						"configure.ac", -- AutoTools
+						"Makefile",
+						"configure.ac",
+						"configure.in",
+						"config.h.in",
+						"meson.build",
+						"meson_options.txt",
+						"build.ninja",
+						".git",
+						"project.smelt",
+					},
+					capabilities = {
+						offsetEncoding = { "utf-16" },
+					},
 					cmd = {
 						(function()
 							local clang = vim.fn.exepath("clang++")
@@ -69,9 +86,16 @@ return {
 						end)(),
 						"--background-index",
 						"--clang-tidy",
-						"--completion-style=bundled",
-						"--cross-file-rename",
 						"--header-insertion=iwyu",
+						"--completion-style=detailed",
+						"--cross-file-rename",
+						"--function-arg-placeholders",
+						"--fallback-style=llvm",
+					},
+					init_options = {
+						usePlaceholders = true,
+						completeUnimported = true,
+						clangdFileStatus = true,
 					},
 					filetypes = { "c", "cpp", "objc", "objcpp" },
 				},
@@ -138,5 +162,34 @@ return {
 				},
 			})
 		end,
+	},
+
+	{
+		"dchinmay2/clangd_extensions.nvim",
+		opts = {
+			inlay_hints = {
+				inline = false,
+			},
+			ast = {
+				--These require codicons (https://github.com/microsoft/vscode-codicons)
+				role_icons = {
+					type = "",
+					declaration = "",
+					expression = "",
+					specifier = "",
+					statement = "",
+					["template argument"] = "",
+				},
+				kind_icons = {
+					Compound = "",
+					Recovery = "",
+					TranslationUnit = "",
+					PackExpansion = "",
+					TemplateTypeParm = "",
+					TemplateTemplateParm = "",
+					TemplateParamObject = "",
+				},
+			},
+		},
 	},
 }
