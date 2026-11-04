@@ -53,13 +53,25 @@ return {
 						{ "<leader>ch", "<cmd>LspClangdSwitchSourceHeader<cr>", desc = "Switch Source/Header (C/C++)" },
 					},
 					cmd = {
-						"clangd",
+						(function()
+							local clang = vim.fn.exepath("clang++")
+							if clang ~= "" then
+								local name = vim.fn.has("win32") == 1 and "clangd.exe" or "clangd"
+								local candidate = vim.fn.fnamemodify(clang, ":h") .. "/" .. name
+								if vim.fn.executable(candidate) == 1 then
+									return candidate
+								end
+							end
+							if vim.fn.executable("clangd") == 1 then
+								return "clangd"
+							end
+							return vim.fn.stdpath("data") .. "/mason/bin/clangd"
+						end)(),
 						"--background-index",
 						"--clang-tidy",
 						"--completion-style=bundled",
 						"--cross-file-rename",
 						"--header-insertion=iwyu",
-						"--experimental-modules-support",
 					},
 					filetypes = { "c", "cpp", "objc", "objcpp" },
 				},

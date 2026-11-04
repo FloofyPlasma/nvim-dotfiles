@@ -50,11 +50,12 @@ return {
 	-- Customize treesitter
 	{
 		"nvim-treesitter/nvim-treesitter",
+		lazy = false,
+		build = ":TSUpdate",
 		opts = {
 			ensure_installed = {
 				"bash",
 				"c",
-				"cpp",
 				"css",
 				"diff",
 				"html",

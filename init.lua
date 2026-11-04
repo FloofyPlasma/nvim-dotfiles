@@ -109,3 +109,15 @@ vim.filetype.add({
 		asm = "fasm",
 	},
 })
+
+vim.api.nvim_create_autocmd("User", {
+	pattern = "TSUpdate",
+	callback = function()
+		require("nvim-treesitter.parsers").cpp = {
+			install_info = {
+				url = "https://github.com/tree-sitter/tree-sitter-cpp",
+				branch = "master",
+			},
+		}
+	end,
+})
